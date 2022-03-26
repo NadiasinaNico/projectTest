@@ -1,11 +1,112 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Table, Form, FormGroup, Label, Input } from "reactstrap";
 import { Modal, ModalBody, ModalHeader, ModalFooter } from "reactstrap";
+import axios from "axios";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 const Employe = () => {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [employes, setEmployes] = useState([]);
+
+  useEffect(() => {
+    EmployeData();
+  }, []);
+
+  const EmployeData = async () => {
+    await axios.get(`/api/employe/`).then((res) => {
+      if (res.status === 200) {
+        setEmployes(res.data.employes);
+        setLoading(true);
+        console.log(res.data.employes);
+      }
+    });
+  };
+
+  const [employe, setEmploye] = useState({
+    nom: "",
+    prenom: "",
+    age: "",
+    poste: "",
+    error_list: [],
+  });
+
+  const handleSubmit = (e) => {
+    e.persist();
+    setEmploye({ ...employe, [e.target.name]: e.target.value });
+  };
+
+  const saveEmploye = async (e) => {
+    e.preventDefault();
+
+    const employeData = {
+      nom: employe.nom,
+      prenom: employe.prenom,
+      age: employe.age,
+      poste: employe.poste,
+    };
+    await axios.post(`/api/employe/`, employeData).then((res) => {
+      if (res.data.status === 200) {
+        console.log(res.data, "66666666666666");
+        Swal.fire({
+          icon: "success",
+          text: res.data.message,
+        });
+        setEmploye({
+          nom: "",
+          prenom: "",
+          age: "",
+          poste: "",
+          error_list: [],
+        });
+        navigate("/employe");
+      // } else if (res.data.status === 422) {
+      //   setEmploye({ ...employe, error_list: res.data.validate_err });
+      // } else {
+      //   Swal.fire({
+      //     text: res.data.validate_err,
+      //     icon: "error",
+      //   });
+       }
+    });
+  };
 
   const toggle = () => setOpen(!open);
+
+  const deleteEmploye = async (id) => {
+    const isConfirm = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      return result.isConfirmed;
+    });
+
+    if (!isConfirm) {
+      return;
+    }
+
+    await axios.delete(`/api/deleteEmploye/${id}`).then((res) => {
+      if (res.data.status === 200) {
+        Swal.fire({
+          icon: "success",
+          text: res.data.message,
+        });
+        EmployeData();
+      } else if (res.data.status === 404) {
+        Swal.fire({
+          text: res.data.message,
+          icon: "error",
+        });
+      }
+    });
+  };
 
   return (
     <div className="container">
@@ -20,6 +121,8 @@ const Employe = () => {
                 name="nom"
                 placeholder="nom"
                 type="text"
+                onChange={handleSubmit}
+                value={employe.nom}
               />
             </FormGroup>
             <FormGroup>
@@ -29,6 +132,8 @@ const Employe = () => {
                 name="prenom"
                 placeholder="prenom"
                 type="text"
+                onChange={handleSubmit}
+                value={employe.prenom}
               />
             </FormGroup>
             <FormGroup>
@@ -38,6 +143,8 @@ const Employe = () => {
                 name="age"
                 placeholder="Age"
                 type="numeric"
+                onChange={handleSubmit}
+                value={employe.age}
               />
             </FormGroup>
             <FormGroup>
@@ -47,32 +154,22 @@ const Employe = () => {
                 name="poste"
                 placeholder="Poste"
                 type="text"
+                onChange={handleSubmit}
+                value={employe.poste}
               />
             </FormGroup>
-             <FormGroup>
-    <Label for="experience">
-      Experience
-    </Label>
-    <Input
-      id="experience"
-      name="experience"
-      type="select"
-    >
-      <option>
-        1
-      </option>
-      <option>
-        2
-      </option>
-      <option>
-        3
-      </option>
-    </Input>
-  </FormGroup>
+            <FormGroup>
+              <Label for="experience">Experience</Label>
+              <Input id="experience" name="experience" type="select">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+              </Input>
+            </FormGroup>
           </Form>
         </ModalBody>
         <ModalFooter>
-          <Button color="primary" onClick={function noRefCheck() {}}>
+          <Button color="primary" onClick={saveEmploye}>
             Add
           </Button>{" "}
           <Button onClick={function noRefCheck() {}}>Cancel</Button>
@@ -92,38 +189,30 @@ const Employe = () => {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <th scope="row">1</th>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>@mdo</td>
-            <td>@mdo</td>
-            <td>@mdo</td>
-            <div>
-              <Button color="primary" onClick={toggle}>
-                Add Employe
-              </Button>
-              <Button color="danger" >
-                delete
-              </Button>
-            </div>
-          </tr>
-          <tr>
-            <th scope="row">2</th>
-            <td>Jacob</td>
-            <td>Thornton</td>
-            <td>@fat</td>
-            <td>@mdo</td>
-            <td>@mdo</td>
-            <div>
-              <Button color="primary" onClick={toggle}>
-                Add Employe
-              </Button>
-              <Button color="danger" >
-                delete
-              </Button>
-            </div>
-          </tr>
+          {employes &&
+            employes.map((employe) => {
+              return (
+                <tr key={employe.id}>
+                  <td>{employe.nom}</td>
+                  <td>{employe.prenom}</td>
+                  <td>{employe.age}</td>
+                  <td>{employe.poste}</td>
+                  <td>{employe.poste}</td>
+                  <div>
+                    <Button color="primary" onClick={toggle}>
+                      Add Employe
+                    </Button>
+                    <Button color="success">Modifier</Button>
+                    <Button
+                      color="danger"
+                      onClick={() => deleteEmploye(employe.id)}
+                    >
+                      delete
+                    </Button>
+                  </div>
+                </tr>
+              );
+            })}
         </tbody>
       </Table>
     </div>

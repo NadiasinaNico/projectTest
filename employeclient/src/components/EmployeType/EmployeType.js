@@ -1,5 +1,5 @@
 import React from "react";
-import Navbar from '../Navbar/Navbar';
+import NavbarMenu from '../Navbar/Navbar';
 import Employe from '../employe/employe';
 import Experience from '../Experience/Experience';
 import { Route, Routes } from "react-router-dom";
@@ -9,9 +9,9 @@ const  EmployeType = () => {
 
     return (
       <div>
-        <Navbar />
+        <NavbarMenu />
         <Routes>
-          <Route path="/" element={<Accueil />} />
+          <Route path="/"  element={<Accueil />} />
           <Route path="/employe" element={<Employe />} />
           <Route path="/experience" element={<Experience />} />
         </Routes>

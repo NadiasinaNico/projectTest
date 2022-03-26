@@ -8,6 +8,7 @@ const Experience = () => {
   const toggle = () => setOpen(!open);
 
   return (
+
     <div className="container">
       <Modal isOpen={open} toggle={toggle}>
         <ModalHeader>Add Experience</ModalHeader>
@@ -54,6 +55,9 @@ const Experience = () => {
               <Button color="primary" onClick={toggle}>
                 Add experience
               </Button>
+              <Button color="success" >
+                Modifier
+              </Button>
               <Button color="danger" >
                 delete
               </Button>
@@ -66,6 +70,9 @@ const Experience = () => {
             <div>
               <Button color="primary" onClick={toggle}>
                 Add experience
+              </Button>
+              <Button color="success" >
+                Modifier
               </Button>
               <Button color="danger" >
                 delete
