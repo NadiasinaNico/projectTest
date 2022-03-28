@@ -15,11 +15,14 @@ class CreateEmployesTable extends Migration
     {
         Schema::create('employes', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('experience_id');
             $table->string('nom');
             $table->string('prenom');
             $table->string('age');
             $table->string('poste');
             $table->timestamps();
+            $table->foreign('experience_id')->references('id')->on('experiences');
+           
         });
     }
 

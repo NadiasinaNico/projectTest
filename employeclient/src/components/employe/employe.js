@@ -3,19 +3,22 @@ import { Button, Table, Form, FormGroup, Label, Input } from "reactstrap";
 import { Modal, ModalBody, ModalHeader, ModalFooter } from "reactstrap";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const Employe = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [employes, setEmployes] = useState([]);
+
 
   useEffect(() => {
     EmployeData();
   }, []);
 
   const EmployeData = async () => {
+    
     await axios.get(`/api/employe/`).then((res) => {
       if (res.status === 200) {
         setEmployes(res.data.employes);
@@ -33,12 +36,17 @@ const Employe = () => {
     error_list: [],
   });
 
+  
+
   const handleSubmit = (e) => {
     e.persist();
     setEmploye({ ...employe, [e.target.name]: e.target.value });
   };
 
+  
+
   const saveEmploye = async (e) => {
+
     e.preventDefault();
 
     const employeData = {
@@ -47,9 +55,8 @@ const Employe = () => {
       age: employe.age,
       poste: employe.poste,
     };
-    await axios.post(`/api/employe/`, employeData).then((res) => {
+    await axios.post(`/api/addEmploye/`, employeData).then((res) => {
       if (res.data.status === 200) {
-        console.log(res.data, "66666666666666");
         Swal.fire({
           icon: "success",
           text: res.data.message,
@@ -61,15 +68,17 @@ const Employe = () => {
           poste: "",
           error_list: [],
         });
+
         navigate("/employe");
-      // } else if (res.data.status === 422) {
-      //   setEmploye({ ...employe, error_list: res.data.validate_err });
-      // } else {
-      //   Swal.fire({
-      //     text: res.data.validate_err,
-      //     icon: "error",
-      //   });
-       }
+        EmployeData();
+        } else if (res.data.status === 422) {
+          setEmploye({ ...employe, error_list: res.data.validate_err });
+        } else {
+          Swal.fire({
+            text: res.data.validate_err,
+            icon: "error",
+          });
+      }
     });
   };
 
@@ -77,7 +86,7 @@ const Employe = () => {
 
   const deleteEmploye = async (id) => {
     const isConfirm = await Swal.fire({
-      title: "Are you sure?",
+      title: "Vous etes sur",
       text: "You won't be able to revert this!",
       icon: "warning",
       showCancelButton: true,
@@ -160,11 +169,19 @@ const Employe = () => {
             </FormGroup>
             <FormGroup>
               <Label for="experience">Experience</Label>
+              
               <Input id="experience" name="experience" type="select">
-                <option>1</option>
-                <option>2</option>
-                <option>3</option>
+              { employes &&
+            employes.map((employe) => {
+              return (
+                <option>
+                {employe.experience.title} -- 
+                {employe.experience.description}
+                </option>
+                  );
+            })}
               </Input>
+             
             </FormGroup>
           </Form>
         </ModalBody>
@@ -176,7 +193,12 @@ const Employe = () => {
         </ModalFooter>
       </Modal>
 
-      <h4 className="text-success text-center">Liste des Employes</h4>
+      <h4 className="text-success text-center">Listes des Employes</h4>
+
+      <Button color="primary" onClick={toggle}>
+                      Add Employe
+                    </Button>
+
       <Table>
         <thead>
           <tr>
@@ -193,15 +215,14 @@ const Employe = () => {
             employes.map((employe) => {
               return (
                 <tr key={employe.id}>
+                <td>{employe.id}</td>
                   <td>{employe.nom}</td>
                   <td>{employe.prenom}</td>
                   <td>{employe.age}</td>
                   <td>{employe.poste}</td>
-                  <td>{employe.poste}</td>
+                  <td>{employe.experience.title} - {employe.experience.description}</td>
                   <div>
-                    <Button color="primary" onClick={toggle}>
-                      Add Employe
-                    </Button>
+                    
                     <Button color="success">Modifier</Button>
                     <Button
                       color="danger"

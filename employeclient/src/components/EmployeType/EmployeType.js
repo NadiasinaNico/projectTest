@@ -4,6 +4,7 @@ import Employe from '../employe/employe';
 import Experience from '../Experience/Experience';
 import { Route, Routes } from "react-router-dom";
 import Accueil from '../Accueil/Accueil';
+import UpdateExperiences from '../Experience/UpdateExperiences';
 
 const  EmployeType = () => {
 
@@ -14,6 +15,7 @@ const  EmployeType = () => {
           <Route path="/"  element={<Accueil />} />
           <Route path="/employe" element={<Employe />} />
           <Route path="/experience" element={<Experience />} />
+          <Route path="/experience/editExperience/:id" element={<UpdateExperiences />} />
         </Routes>
       </div>
     );
