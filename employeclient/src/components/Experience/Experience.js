@@ -144,6 +144,12 @@ const Experience = () => {
       </Modal>
 
       <h4 className="text-success text-center">Liste des Employers</h4>
+
+       <Button color="primary" onClick={toggle}>
+                      Add Experience
+                    </Button>
+
+
       <Table>
         <thead>
           <tr>
@@ -161,18 +167,18 @@ const Experience = () => {
                   <td>{experience.title}</td>
                   <td>{experience.description}</td>
                   <div>
-                    <Button color="primary" onClick={toggle}>
-                      Add Experience
-                    </Button>
+                   
                     <td>
-                        <Link to={`editExperience/${experience.id}`} className="btn btn-success btn-sm">Edit</Link>
-                    </td>
-                    <Button
+                        <Link to={`editExperience/${experience.id}`} 
+                        className="btn btn-success btn-sm">Edit</Link>
+                   <Button
                       color="danger"
                       onClick={() => deleteExperience(experience.id)}
                     >
                       delete
                     </Button>
+                    </td>
+                    
                   </div>
                 </tr>
               );

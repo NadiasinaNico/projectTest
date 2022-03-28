@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\Employes;
+use App\Models\Experience;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
@@ -35,13 +36,12 @@ class EmployeController extends Controller
                 'validate_err' => $validator->errors(),
             ]);
         } else {
-            $experience = Experience::findOrFail($validator['experience']);
             $employe = new Employes;
             $employe->nom = $request->input('nom');
             $employe->prenom = $request->input('prenom');
             $employe->age = $request->input('age');
             $employe->poste = $request->input('poste');
-            $employe->experience()->save($experience);
+            $employe->save();
             
             return response()->json([
                 'status' => 200,
